@@ -21,42 +21,59 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void Update(){
+		CanIdle ();
 		CanMove ();
 
 	}
 		
 	void CanIdle(){
-	
+		if(isIdle){
+			if(Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow)) {
+				CheckIfCanmove ();
+			}
+		}
+
 	}
 
 	void CheckIfCanmove(){
+		//Raycast find if there is any collider in front of the player
+		setMove();
 	
 	}
 
 	void setMove(){
-	
+		Debug.Log ("Hit nothing. keep moving!");
+		isIdle = false;
+		ismoving = true;
+		jumpStart = true;
 	}
 
 	void CanMove(){
-		if(Input.GetKeyDown (KeyCode.UpArrow)){
-			Moving (new Vector3(transform.position.x, transform.position.y, transform.position.z + moveDistance));
-		}
-		else if(Input.GetKeyDown (KeyCode.DownArrow)){
-			Moving (new Vector3(transform.position.x, transform.position.y, transform.position.z - moveDistance));
-		}
-		else if(Input.GetKeyDown (KeyCode.LeftArrow)){
-			Moving (new Vector3(transform.position.x - moveDistance, transform.position.y, transform.position.z));
-		}
-		 else if(Input.GetKeyDown (KeyCode.RightArrow)){
-			Moving (new Vector3(transform.position.x + moveDistance, transform.position.y, transform.position.z + moveDistance));
+		if (ismoving) {
+			if (Input.GetKeyUp (KeyCode.UpArrow)) {
+				Moving (new Vector3 (transform.position.x, transform.position.y, transform.position.z + moveDistance));
+				SetMoveForwardState ();
+			} else if (Input.GetKeyUp (KeyCode.DownArrow)) {
+				Moving (new Vector3 (transform.position.x, transform.position.y, transform.position.z - moveDistance));
+			} else if (Input.GetKeyUp (KeyCode.LeftArrow)) {
+				Moving (new Vector3 (transform.position.x - moveDistance, transform.position.y, transform.position.z));
+			} else if (Input.GetKeyUp (KeyCode.RightArrow)) {
+				Moving (new Vector3 (transform.position.x + moveDistance, transform.position.y, transform.position.z + moveDistance));
+			}
 		}
 	}
 		
 	void Moving(Vector3 pos){
-		LeanTween.move (this.gameObject, pos, moveTime);
+		isIdle = false;
+		ismoving = false;
+		isJumping = true;
+		jumpStart = false;
+		LeanTween.move (this.gameObject, pos, moveTime).setOnComplete(MoveComplete);
 	}
 
 	void MoveComplete(){
+		isJumping = false;
+		isIdle = true;
 	
 	}
 
